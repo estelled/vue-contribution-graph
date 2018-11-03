@@ -1,8 +1,10 @@
 <template>
   <div id="graph">
     <button v-on:click="showCont()">show contributions</button>
-    <p>{{ contNumber}}<p>
+    <p>{{ activityDict}}<p>  
     <p>num colonne : {{numCol}}</p>
+    <p>{{contTable}}</p>
+
     <div id="monthRow">
       <div v-for="month in months" :key="month">{{ month }}</div>
     </div>
@@ -12,12 +14,18 @@
         <span>Wed</span>
         <span>Fri</span>
       </div>
+
       <!-- drawGraph -->
       <div id="canvas">
         <div class="graph-col" v-for="i in numCol" :key="i"> <!--starts from 1 ! -->
           <div class="graph-row" v-for="j in numRow" :key="j"> 
             <div class= "circle" v-bind:id="idCalc(i,j)"></div>
-            <b-tooltip v-bind:target="idCalc(i,j).toString()" >{{activity[0][1].toString()}} contributions on {{activity[0][0].toString()}}</b-tooltip>  
+            <b-tooltip v-bind:target="idCalc(i,j).toString()">
+              <div v-if="activityDict[id2date(idCalc(i,j))]"> 
+                {{activityDict[id2date(idCalc(i,j))]}} contributions on {{id2date(idCalc(i,j))}}
+              </div>
+              <div v-else>no contributions on {{id2date(idCalc(i,j))}}</div>     
+            </b-tooltip>  
           </div>
         </div>
       </div>
@@ -26,36 +34,103 @@
 </template>
 
 <script>
-
 export default {
-  name: 'contribution-graph',
+  name: "contribution-graph",
   props: {
     startDate: String,
     activity: Array,
-    colors: Array,
+    colors: Array
   },
-  data: function () {
+  data: function() {
     return {
       numRow: 7,
-      contNumber: 'no contributions',
-      months: ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
+      numCol: 52,
     };
   },
   methods: {
     showCont() {
-      this.contNumber = '5'
+      this.contNumber = "5";
     },
-    idCalc: function(i,j) {
-      return (i-1)*7+j
+    idCalc: function(i, j) {
+      return (i-1) * 7 + j-1;
     },
+    calcYearDays: function() {
+      var startDate = new Date(this.startDate);
+      var day = startDate.getDate();
+      var month = startDate.getMonth();
+      var year = startDate.getFullYear() + 1;
+
+      var endDate = new Date(year, month, day);
+      var oneDay = 24 * 60 * 60 * 1000; // hours*minutes*seconds*milliseconds
+      var days = Math.round(
+        Math.abs((endDate.getTime() - startDate.getTime()) / oneDay)
+      );
+
+      return days;
+    },
+    id2date: function(id) {
+      var result = new Date(this.startDate);
+      result.setDate(result.getDate() + id);
+      return result.toDateString();
+    }
   },
   computed: {
-    numCol: function() {
-      return Math.floor(365 / this.numRow)
-    } 
+    lastRow: function() {
+      var daysInYear = this.calcYearDays(this.startDate);
+      var lastRow = daysInYear - (7 * this.numCol);
+      return lastRow;
+    },
+    activityDict: function() {
+      var ad = {};
+      for (let elem of this.contTable) {
+        var date = new Date(elem[0]);
+        var temp = date.toDateString();
+        ad[temp] = elem[1];
+      }
+      return ad;
+    },
+    contTable: function() {
+      var contTable = this.activity.slice(0); //copy of input
+      var length = this.activity.length;
+      var endDate = new Date(this.startDate);
+      var daysInYear = this.calcYearDays();
+      endDate.setDate(endDate.getDate() + daysInYear); //change later with exact year days number
+      var startDate = new Date(this.startDate);
+      //reverse loop to not mess up the index after splice
+      for (let i = length - 1; i >= 0; i--) {
+        var tempDate = new Date(this.activity[i][0]);
+        if (tempDate < startDate || tempDate > endDate) {
+          contTable.splice(i, 1);
+        } //else
+      }
+      return contTable;
+    },
+    months: function() {
+      var monthTable = [
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec"
+      ];
+      var months = [];
+      var startDate = new Date(this.startDate);
+      var startMonth = startDate.getMonth(); //1-12
+      for (let i = 0; i < 12; i++) {
+        var mIndex = (startMonth + i) % 12;
+        months[i] = monthTable[mIndex];
+      }
+      return months;
+    }
   }
-}
-
+};
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
@@ -65,13 +140,13 @@ export default {
   width: 50%;
 }
 #monthRow {
-  display :flex;
+  display: flex;
   flex-direction: row;
   width: 650px;
   justify-content: space-between;
   font-size: 11px;
-  color : #414660; 
-  margin-left: 40px;  
+  color: #414660;
+  margin-left: 40px;
   margin-bottom: 10px;
 }
 #container {
@@ -94,12 +169,9 @@ export default {
       width: 11px;
       height: 11px;
       border-radius: 50%;
-      background-color: #EBEDF0;
-      margin : 1px;
+      background-color: #ebedf0;
+      margin: 1px;
     }
   }
-}//container
-
-
-
+} //container
 </style>
