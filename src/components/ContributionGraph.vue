@@ -2,7 +2,7 @@
   <div id="graph">
     <button v-on:click="showCont()">show contributions</button>
     <p>{{ activityDict}}<p>  
-    <p>num colonne : {{numCol}}</p>
+    <p>num colonne : {{numCol}}  last row : {{ lastRow }}</p>
     <p>{{contTable}}</p>
 
     <div id="monthRow">
@@ -18,7 +18,7 @@
       <!-- drawGraph -->
       <div id="canvas">
         <div class="graph-col" v-for="i in numCol" :key="i"> <!--starts from 1 ! -->
-          <div class="graph-row" v-for="j in numRow" :key="j"> 
+          <div class="graph-row" v-for="j in numRow(i)" :key="j"> 
             <div class= "circle" v-bind:id="idCalc(i,j)"></div>
             <b-tooltip v-bind:target="idCalc(i,j).toString()">
               <div v-if="activityDict[id2date(idCalc(i,j))]"> 
@@ -43,8 +43,7 @@ export default {
   },
   data: function() {
     return {
-      numRow: 7,
-      numCol: 52,
+      numCol: 53,
     };
   },
   methods: {
@@ -65,19 +64,26 @@ export default {
       var days = Math.round(
         Math.abs((endDate.getTime() - startDate.getTime()) / oneDay)
       );
-
       return days;
     },
     id2date: function(id) {
       var result = new Date(this.startDate);
       result.setDate(result.getDate() + id);
       return result.toDateString();
-    }
+    }, 
+    numRow: function(i) {
+      var row = 7;
+      if(i == 53) {
+        row = this.lastRow;
+      }
+      return row;
+    },
   },
   computed: {
+    // the last row has either 1 or 2 days, depending on leap years.
     lastRow: function() {
       var daysInYear = this.calcYearDays(this.startDate);
-      var lastRow = daysInYear - (7 * this.numCol);
+      var lastRow = daysInYear - (7 * 52);
       return lastRow;
     },
     activityDict: function() {
