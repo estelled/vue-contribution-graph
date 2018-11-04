@@ -22,11 +22,7 @@
       <div id="canvas">
         <div class="graph-col" v-for="i in numCol" :key="i"> <!--starts from 1 ! -->
           <div class="graph-row" v-for="j in numRow(i)" :key="j"> 
-              <div v-if="activityDict[id2date(idCalc(i,j))]">
-                <div class="circle" v-bind:id="idCalc(i,j)" v-bind:style="{ 'background-color': colors[toValue(activityDict[id2date(idCalc(i,j))])] }"></div>
-              </div>     
-              <div v-else class= "circle" v-bind:id="idCalc(i,j)"></div>
-
+            <div class="circle" v-bind:id="idCalc(i,j)" v-bind:style="circleColor(i,j)"></div>
             <b-tooltip v-bind:target="idCalc(i,j).toString()">
               <div v-if="activityDict[id2date(idCalc(i,j))]"> 
                 {{activityDict[id2date(idCalc(i,j))]}} contributions on {{id2date(idCalc(i,j))}}
@@ -98,6 +94,17 @@ export default {
         return 2;
       } else {
         return 3;
+      }
+    },
+    circleColor: function(i,j) {
+      if (this.activityDict[this.id2date(this.idCalc(i,j))]) {
+        return { 
+          'background-color': this.colors[this.toValue(this.activityDict[this.id2date(this.idCalc(i,j))])],
+          } 
+      } else {
+        return {
+          'background-color': '#ebedf0',
+        }
       }
     },
   },
