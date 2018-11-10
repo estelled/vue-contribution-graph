@@ -1,13 +1,5 @@
 <template>
   <div id="graph">
-    <button v-on:click="showCont()">show contributions</button>
-    <p>{{ activityDict}}<p>  
-    <div v-if="activityDict[id2date(idCalc(1,1))]">
-    <p> to color : {{ colors[toValue(activityDict[id2date(idCalc(1,1))])] }}</p>
-    <div class="circle" v-bind:style="{ 'background-color': colors[toValue(activityDict[id2date(idCalc(1,1))])] }">the color</div>
-    </div>
-    <p>{{contTable}}</p>
-
     <div id="monthRow">
       <div v-for="month in months" :key="month">{{ month }}</div>
     </div>
@@ -16,9 +8,8 @@
         <span>Mon</span>
         <span>Wed</span>
         <span>Fri</span>
+        <span>Sun</span>
       </div>
-
-      <!-- drawGraph -->
       <div id="canvas">
         <div class="graph-col" v-for="i in numCol" :key="i"> <!--starts from 1 ! -->
           <div class="graph-row" v-for="j in numRow(i)" :key="j"> 
@@ -46,7 +37,7 @@ export default {
   },
   data: function() {
     return {
-      numCol: 53,
+      numCol: 53
     };
   },
   methods: {
@@ -54,7 +45,7 @@ export default {
       this.contNumber = "5";
     },
     idCalc: function(i, j) {
-      return (i-1) * 7 + j-1;
+      return (i - 1) * 7 + j - 1;
     },
     calcYearDays: function() {
       var startDate = new Date(this.startDate);
@@ -73,10 +64,10 @@ export default {
       var result = new Date(this.startDate);
       result.setDate(result.getDate() + id);
       return result.toDateString();
-    }, 
+    },
     numRow: function(i) {
       var row = 7;
-      if(i == 53) {
+      if (i == 53) {
         row = this.lastRow;
       }
       return row;
@@ -85,7 +76,7 @@ export default {
       if (contNumber == 0 || this.contMax == 0) {
         return null;
       }
-      var ratio = contNumber / this.contMax * 100;
+      var ratio = (contNumber / this.contMax) * 100;
       if (ratio <= 25) {
         return 0;
       } else if (ratio <= 50) {
@@ -96,23 +87,25 @@ export default {
         return 3;
       }
     },
-    circleColor: function(i,j) {
-      if (this.activityDict[this.id2date(this.idCalc(i,j))]) {
-        return { 
-          'background-color': this.colors[this.toValue(this.activityDict[this.id2date(this.idCalc(i,j))])],
-          } 
+    circleColor: function(i, j) {
+      if (this.activityDict[this.id2date(this.idCalc(i, j))]) {
+        return {
+          "background-color": this.colors[
+            this.toValue(this.activityDict[this.id2date(this.idCalc(i, j))])
+          ]
+        };
       } else {
         return {
-          'background-color': '#ebedf0',
-        }
+          "background-color": "#ebedf0"
+        };
       }
-    },
+    }
   },
   computed: {
     // the last row has either 1 or 2 days, depending on leap years.
     lastRow: function() {
       var daysInYear = this.calcYearDays(this.startDate);
-      var lastRow = daysInYear - (7 * 52);
+      var lastRow = daysInYear - 7 * 52;
       return lastRow;
     },
     activityDict: function() {
@@ -129,7 +122,7 @@ export default {
       var length = this.activity.length;
       var endDate = new Date(this.startDate);
       var daysInYear = this.calcYearDays();
-      endDate.setDate(endDate.getDate() + daysInYear); //change later with exact year days number
+      endDate.setDate(endDate.getDate() + daysInYear); 
       var startDate = new Date(this.startDate);
       //reverse loop to not mess up the index after splice
       for (let i = length - 1; i >= 0; i--) {
@@ -172,7 +165,7 @@ export default {
         max = Math.max(temp, max);
       }
       return max;
-    },
+    }
   }
 };
 </script>

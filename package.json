@@ -1,10 +1,11 @@
 {
   "name": "vue-contribution-graph",
-  "version": "0.1.0",
-  "private": true,
+  "version": "0.1.1",
+  "private": false,
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
+    "build-bundle": "vue-cli-service build --target lib --name vue-contribution-graph ./src/App.vue",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
@@ -44,5 +45,13 @@
     "> 1%",
     "last 2 versions",
     "not ie <= 8"
+  ],
+  "main": "./dist/vue-contribution-graph.common.js",
+  "files": [
+    "dist/*",
+    "src/*",
+    "public/*",
+    "*.json",
+    "*.js"
   ]
 }
