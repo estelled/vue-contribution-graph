@@ -5,10 +5,7 @@
     </div>
     <div id="container">
       <div id="dayColumn">
-        <span>Mon</span>
-        <span>Wed</span>
-        <span>Fri</span>
-        <span>Sun</span>
+        <div v-for="day in days" :key="day">{{ day }}</div>
       </div>
       <div id="canvas">
         <div class="graph-col" v-for="i in numCol" :key="i"> <!--starts from 1 ! -->
@@ -156,6 +153,25 @@ export default {
         months[i] = monthTable[mIndex];
       }
       return months;
+    },
+    days: function() {
+      var dayTable = [
+        "Sun",
+        "Mon",
+        "Tue",
+        "Wed",
+        "Thu",
+        "Fri",
+        "Sat"
+      ];
+      var days = [];
+      var startDate = new Date(this.startDate);
+      var startDay = startDate.getDay();// Sunday - Saturday : 0 - 6
+      for (let i = 0; i < 4; i++) {
+        var mIndex = (startDay + i*2) % 7;
+        days[i] = dayTable[mIndex];
+      }
+      return days;
     },
     contMax: function() {
       var length = this.contTable.length;
