@@ -1,14 +1,15 @@
 <template>
   <div id="graph">
-    <div id="monthRow">
-      <div v-for="month in months" :key="month">{{ month }}</div>
-    </div>
     <div id="container">
       <div id="dayColumn">
         <div v-for="day in days" :key="day">{{ day }}</div>
       </div>
-      <div id="canvas">
-        <div class="graph-col" v-for="i in numCol" :key="i"> <!--starts from 1 ! -->
+      <div id="canvas" >
+        <div v-for="i in numCol" :key="i"> <!--starts from 1 ! -->
+          <div v-if="i == 1  && index2month(i) == index2month(i+1) || index2month(i) != index2month(i-1) ">
+            <div class="month">{{index2month(i)}}</div>
+          </div>
+          <div v-else><div class="empty"></div></div>
           <div class="graph-row" v-for="j in numRow(i)" :key="j"> 
             <div class="circle" v-bind:id="idCalc(i,j)" v-bind:style="circleColor(i,j)"></div>
             <b-tooltip v-bind:target="idCalc(i,j).toString()">
@@ -62,6 +63,28 @@ export default {
       result.setDate(result.getDate() + id);
       return result.toDateString();
     },
+    index2month: function(i) {
+      var monthTable = [
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec"
+      ];
+      var id = this.idCalc(i,1); //always first row
+      var date = new Date(this.startDate);
+      date.setDate(date.getDate() + id);
+      var i = date.getMonth(); //0-11
+      return monthTable[i];
+    },
+
     numRow: function(i) {
       var row = 7;
       if (i == 53) {
@@ -130,30 +153,6 @@ export default {
       }
       return contTable;
     },
-    months: function() {
-      var monthTable = [
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "Jun",
-        "Jul",
-        "Aug",
-        "Sep",
-        "Oct",
-        "Nov",
-        "Dec"
-      ];
-      var months = [];
-      var startDate = new Date(this.startDate);
-      var startMonth = startDate.getMonth(); //1-12
-      for (let i = 0; i < 12; i++) {
-        var mIndex = (startMonth + i) % 12;
-        months[i] = monthTable[mIndex];
-      }
-      return months;
-    },
     days: function() {
       var dayTable = [
         "Sun",
@@ -192,16 +191,7 @@ export default {
   margin: auto;
   width: 50%;
 }
-#monthRow {
-  display: flex;
-  flex-direction: row;
-  width: 650px;
-  justify-content: space-between;
-  font-size: 11px;
-  color: #414660;
-  margin-left: 40px;
-  margin-bottom: 10px;
-}
+
 #container {
   display: flex;
   flex-direction: row;
@@ -209,15 +199,27 @@ export default {
     display: flex;
     flex-direction: column;
     width: 20px;
-    height: 85px;
+    height: 87px;
     justify-content: space-between;
     font-size: 11px;
     color: #414660;
     margin-right: 10px;
+    margin-top: 20px;
   }
   #canvas {
     display: flex;
     flex-direction: row;
+    .month {
+      font-size: 11px;
+      color: #414660;
+      width: 10px;
+      margin-bottom: 5px;
+    }
+    .empty {
+      margin-bottom: 11px;
+      color:transparent;
+      border: 5px solid transparent;
+    }
     .circle {
       width: 11px;
       height: 11px;
@@ -227,4 +229,5 @@ export default {
     }
   }
 } //container
+
 </style>
